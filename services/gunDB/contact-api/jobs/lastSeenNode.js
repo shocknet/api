@@ -11,6 +11,7 @@ const {
   }
 } = require('shock-common')
 const Key = require('../key')
+const { getUTCTimestamp } = require('../../../../utils/helpers')
 
 /**
  * @typedef {import('../SimpleGUN').GUNNode} GUNNode
@@ -32,7 +33,7 @@ const lastSeenNode = user => {
 
   setInterval(() => {
     if (user.is) {
-      user.get(Key.LAST_SEEN_NODE).put(Date.now(), ack => {
+      user.get(Key.LAST_SEEN_NODE).put(getUTCTimestamp(), ack => {
         if (ack.err && typeof ack.err !== 'number') {
           logger.error(`Error inside lastSeenNode job: ${ack.err}`)
         }
@@ -41,7 +42,7 @@ const lastSeenNode = user => {
       user
         .get(Key.PROFILE)
         .get(Key.LAST_SEEN_NODE)
-        .put(Date.now(), ack => {
+        .put(getUTCTimestamp(), ack => {
           if (ack.err && typeof ack.err !== 'number') {
             logger.error(`Error inside lastSeenNode job: ${ack.err}`)
           }

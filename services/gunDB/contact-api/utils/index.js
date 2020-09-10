@@ -6,6 +6,7 @@ const logger = require('winston')
 const { Constants } = require('shock-common')
 
 const Key = require('../key')
+const { getUTCTimestamp } = require('../../../../utils/helpers')
 
 /**
  * @typedef {import('../SimpleGUN').GUNNode} GUNNode
@@ -326,7 +327,7 @@ const isNodeOnline = async pub => {
    */
   const isAppOnline = lastSeen =>
     typeof lastSeen === 'number' &&
-    Date.now() - lastSeen < SET_LAST_SEEN_APP_INTERVAL * 2
+    getUTCTimestamp() - lastSeen < SET_LAST_SEEN_APP_INTERVAL * 2
 
   const userNode = require('../../Mediator')
     .getGun()
@@ -338,7 +339,8 @@ const isNodeOnline = async pub => {
   return (
     isOnlineApp ||
     (typeof lastSeenNode === 'number' &&
-      Date.now() - lastSeenNode < Constants.Misc.LAST_SEEN_NODE_INTERVAL * 2)
+      getUTCTimestamp() - lastSeenNode <
+        Constants.Misc.LAST_SEEN_NODE_INTERVAL * 2)
   )
 }
 

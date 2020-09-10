@@ -9,6 +9,7 @@ const { Constants, Schema } = Common
 const { ErrorCode } = Constants
 
 const { sendPaymentV2Invoice } = require('../../../utils/lightningServices/v2')
+const { getUTCTimestamp } = require('../../../utils/helpers')
 
 /**
  * @typedef {import('../../../utils/lightningServices/types').PaymentV2} PaymentV2
@@ -1204,7 +1205,7 @@ const setLastSeenApp = () =>
     require('../Mediator')
       .getUser()
       .get(Key.LAST_SEEN_APP)
-      .put(Date.now(), ack => {
+      .put(getUTCTimestamp(), ack => {
         if (ack.err && typeof ack.err !== 'number') {
           rej(new Error(ack.err))
         } else {
@@ -1218,7 +1219,7 @@ const setLastSeenApp = () =>
           .getUser()
           .get(Key.PROFILE)
           .get(Key.LAST_SEEN_APP)
-          .put(Date.now(), ack => {
+          .put(getUTCTimestamp(), ack => {
             if (ack.err && typeof ack.err !== 'number') {
               rej(new Error(ack.err))
             } else {
