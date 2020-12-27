@@ -62,3 +62,5 @@ exports.TOTAL_TIPS = 'totalTips'
 exports.PROFILE_BINARY = 'profileBinary'
 
 exports.POSTS_NEW = 'posts'
+
+exports.CHAT_BOTS_CHATS = 'chatBotsChats'

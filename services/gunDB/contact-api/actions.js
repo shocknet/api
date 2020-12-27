@@ -802,6 +802,71 @@ const deleteMessage = async (recipientPub, msgID, user) => {
       })
   })
 }
+/**
+ * Returns the message id.
+ * @param {string} botId
+ * @param {string} body
+ * @param {boolean} outgoing
+ * @param {UserGUNNode} user
+ * @param {ISEA} SEA
+ * @returns {Promise<import('shock-common').Schema.ChatMessage>} The message id.
+ */
+const writeBotMessage = async (botId, body, outgoing, user, SEA) => {
+  if (!user.is) {
+    throw new Error(ErrorCode.NOT_AUTH)
+  }
+
+  if (typeof botId !== 'string') {
+    throw new TypeError(
+      `expected botId to be an string, but instead got: ${typeof botId}`
+    )
+  }
+
+  if (botId.length === 0) {
+    throw new TypeError(
+      'expected botId to be an string of length greater than zero'
+    )
+  }
+
+  if (typeof body !== 'string') {
+    throw new TypeError(
+      `expected message to be an string, instead got: ${typeof body}`
+    )
+  }
+
+  if (body.length === 0) {
+    throw new TypeError(
+      'expected message to be an string of length greater than zero'
+    )
+  }
+
+  const mySecret = require('../Mediator').getMySecret()
+  const encryptedBody = await SEA.encrypt(body, mySecret)
+
+  const newMessage = {
+    body: encryptedBody,
+    timestamp: Date.now(),
+    outgoing
+  }
+  return new Promise((res, rej) => {
+    const msgNode = user
+      .get(Key.CHAT_BOTS_CHATS)
+      .get(botId)
+      .get(Key.MESSAGES)
+      .set(newMessage, ack => {
+        if (ack.err && typeof ack.err !== 'number') {
+          rej(new Error(ack.err))
+        } else {
+          res({
+            body,
+            id: msgNode._.get,
+            outgoing,
+            timestamp: newMessage.timestamp
+          })
+        }
+      })
+  })
+}
 
 /**
  * @param {string|null} avatar
@@ -1625,5 +1690,6 @@ module.exports = {
   initWall,
   sendMessageNew,
   sendSpontaneousPayment,
-  createPostNew
+  createPostNew,
+  writeBotMessage
 }

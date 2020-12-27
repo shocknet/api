@@ -36,6 +36,7 @@ const {
   listPayments
 } = require('../utils/lightningServices/v2')
 const GunWriteRPC = require('../services/gunDB/rpc')
+const { handleBotMessage } = require('../services/chatBots')
 
 const DEFAULT_MAX_NUM_ROUTES_TO_QUERY = 10
 const SESSION_ID = uuid()
@@ -2565,10 +2566,21 @@ module.exports = async (
       const user = GunDB.getUser()
       const SEA = GunDB.mySEA
 
+      if (publicKey.startsWith('bot-')) {
+        //this message is for a bot
+        handleBotMessage(publicKey, body)
+        return res
+          .status(200)
+          .json(
+            await GunActions.writeBotMessage(publicKey, body, true, user, SEA)
+          )
+      }
+
       return res
         .status(200)
         .json(await GunActions.sendMessageNew(publicKey, body, user, SEA))
     } catch (err) {
+      console.log(err)
       logger.error(err)
       return res.status(500).json({
         errorMessage: err.message

@@ -21,6 +21,10 @@ program
 	.option("-n, --lndlogfile <file path>", "path to lnd log file to send to browser")
 	.option("-k, --le-email [email]", "lets encrypt required contact email")
 	.option("-c, --mainnet", "run server on mainnet mode")
+	.option("--loop", "connect to loopd")
+	.option("--loop-host", "connect to loopd")
+	.option("--loop-macaroon-path", "macaroon file for loopd")
+	.option("--loop-tls-path", "tls file for loopd")
 	.parse(process.argv);
 
 // load server

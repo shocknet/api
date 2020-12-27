@@ -16,10 +16,16 @@ const lnrpc = require('../../services/lnd/lightning')
  * @prop {string} lndHost
  * @prop {string} lndCertPath
  * @prop {string} macaroonPath
+ * @prop {boolean} loopEnabled
+ * @prop {string} loopHost
+ * @prop {string} loopCertPath
+ * @prop {string} loopMacaroonPath
  * @prop {string} lndProto
  * @prop {string} routerProto
  * @prop {string} invoicesProto
  * @prop {string} walletUnlockerProto
+ * @prop {string} loopClientProto
+ * @prop {string} chainnotifierProto
  */
 
 class LightningServices {
@@ -58,7 +64,11 @@ class LightningServices {
       serverHost: program.serverhost || newDefaults.serverHost,
       lndHost: program.lndhost || newDefaults.lndHost,
       lndCertPath: program.lndCertPath || newDefaults.lndCertPath,
-      macaroonPath: program.macaroonPath || newDefaults.macaroonPath
+      macaroonPath: program.macaroonPath || newDefaults.macaroonPath,
+      loopEnabled: program.loop || newDefaults.loopEnabled,
+      loopHost: program.loopHost || newDefaults.loopHost,
+      loopCertPath: program.loopCertPath || newDefaults.loopCertPath,
+      loopMacaroonPath: program.loopMacaroonPath || newDefaults.loopMacaroonPath
     }
   }
 
@@ -70,7 +80,9 @@ class LightningServices {
     return {
       lightning: this.lightning,
       walletUnlocker: this.walletUnlocker,
-      router: this.router
+      router: this.router,
+      chainNotifier: this.chainNotifier,
+      swapClient: this.swapClient
     }
   }
 
@@ -115,25 +127,48 @@ class LightningServices {
   }
 
   init = async () => {
-    const { macaroonPath, lndHost, lndCertPath } = this.config
+    const {
+      macaroonPath,
+      lndHost,
+      lndCertPath,
+      loopEnabled,
+      loopHost,
+      loopCertPath,
+      loopMacaroonPath
+    } = this.config
     const macaroonExists = await FS.access(macaroonPath)
     const lnServices = await lnrpc({
       lnrpcProtoPath: this.defaults.lndProto,
       routerProtoPath: this.defaults.routerProto,
       invoicesProtoPath: this.defaults.invoicesProto,
       walletUnlockerProtoPath: this.defaults.walletUnlockerProto,
+      loopClientProtoPath: this.defaults.loopClientProto,
+      chainnotifierProtoPath: this.defaults.chainnotifierProto,
       lndHost,
       lndCertPath,
-      macaroonPath: macaroonExists ? macaroonPath : null
+      macaroonPath: macaroonExists ? macaroonPath : null,
+      loopEnabled,
+      loopHost,
+      loopCertPath,
+      loopMacaroonPath
     })
     if (!lnServices) {
       throw new Error(`Could not init lnServices`)
     }
-    const { lightning, walletUnlocker, router, invoices } = lnServices
+    const {
+      lightning,
+      walletUnlocker,
+      router,
+      swapClient,
+      chainNotifier,
+      invoices
+    } = lnServices
     this.lightning = lightning
     this.walletUnlocker = walletUnlocker
     this.router = router
+    this.chainNotifier = chainNotifier
     this.invoices = invoices
+    this.swapClient = swapClient ? swapClient : null
     this.lnServicesData = {
       lndProto: this.defaults.lndProto,
       lndHost,

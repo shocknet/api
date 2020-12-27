@@ -17,6 +17,7 @@ const {
 } = require('../services/gunDB/Mediator')
 const { deepDecryptIfNeeded } = require('../services/gunDB/rpc')
 const GunEvents = require('../services/gunDB/contact-api/events')
+const { messagesManager } = require('../services/chatBots')
 /**
  * @typedef {import('../services/gunDB/Mediator').SimpleSocket} SimpleSocket
  * @typedef {import('../services/gunDB/contact-api/SimpleGUN').ValidDataValue} ValidDataValue
@@ -532,6 +533,14 @@ module.exports = (
       }
 
       /**
+       * @param {Common.Schema.Chat[]} allChats
+       */
+      const emitProcessedChats = allChats => {
+        socket.emit('$shock', allChats)
+      }
+      messagesManager.ConnectBots(emitProcessedChats)
+
+      /**
        * @param {Common.Schema.Chat[]} chats
        */
       const onChats = chats => {
@@ -557,8 +566,8 @@ module.exports = (
             return stripped
           }
         )
-
-        socket.emit('$shock', processed)
+        const allChats = messagesManager.joinGunChats(processed)
+        emitProcessedChats(allChats)
       }
 
       chatsUnsub = GunEvents.onChats(onChats)

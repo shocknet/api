@@ -615,6 +615,132 @@ const onSeedBackup = (cb, user, SEA) => {
   })
 }
 
+/**
+ * @typedef {object} ProcessedMessage
+ * @prop {string} body
+ * @prop {boolean} outgoing
+ * @prop {number} timestamp
+ */
+/**
+ * @typedef {object} ProcessedChat
+ * @prop {string} with
+ * @prop {Record<string,ProcessedMessage>} messages
+ */
+/**
+ * @typedef {Record<string,(ProcessedChat|null)>} ProcessedChats
+ * @typedef {(chats:ProcessedChats|null)=>void} ChatBotsChatsListener
+ */
+/** @type {ProcessedChats|null} */
+let currentChatBotsChats = null
+
+const getCurrentChatBotsChats = () => currentChatBotsChats
+
+/** @type {Set<ChatBotsChatsListener>} */
+const chatBotsChatsListeners = new Set()
+
+const notifyChatBotsChatsListeners = () => {
+  chatBotsChatsListeners.forEach(l => l(currentChatBotsChats))
+}
+
+let chatBotsChatsSubbed = false
+let chatBotsChatsSubbing = false
+/**
+ * @param {(currentChatBotsChats:ProcessedChats|null) => void} cb
+ * @param {UserGUNNode} user
+ * @param {ISEA} SEA
+ * @throws {Error} If user hasn't been auth.
+ * @returns {()=>void}
+ */
+const onChatBotsChats = (cb, user, SEA) => {
+  if (!user.is) {
+    throw new Error(ErrorCode.NOT_AUTH)
+  }
+  chatBotsChatsListeners.add(cb)
+  const deletecb = () => {
+    chatBotsChatsListeners.delete(cb)
+  }
+  cb(currentChatBotsChats)
+  const mySecret = require('../../Mediator').getMySecret()
+
+  if (chatBotsChatsSubbed || chatBotsChatsSubbing) {
+    return deletecb
+  }
+  chatBotsChatsSubbing = true
+  user.get(Key.CHAT_BOTS_CHATS).open(
+    debounce(async botsChats => {
+      try {
+        if (!botsChats || typeof botsChats !== 'object') {
+          return
+        }
+
+        /**
+         * @type {ProcessedChats}
+         */
+        const newChats = {}
+        await CommonUtils.asyncForEach(
+          Object.entries(botsChats),
+          async ([botId, botChat]) => {
+            if (typeof botChat !== 'object') {
+              return
+            }
+
+            if (botChat === null) {
+              newChats[botId] = null
+              return
+            }
+
+            const { messages } = botChat
+
+            if (!newChats[botId]) {
+              newChats[botId] = {
+                with: botId,
+                messages: {}
+              }
+            }
+
+            if (!messages || typeof messages !== 'object') {
+              return
+            }
+            await CommonUtils.asyncForEach(
+              Object.entries(messages),
+              async ([messageId, message]) => {
+                if (typeof message !== 'object' || message === null) {
+                  return
+                }
+                if (
+                  typeof message.body !== 'string' ||
+                  typeof message.timestamp !== 'number' ||
+                  typeof message.outgoing !== 'boolean'
+                ) {
+                  return
+                }
+                const newChat = newChats[botId]
+                if (!newChat) {
+                  return
+                }
+                newChat.messages[messageId] = {
+                  body: await SEA.decrypt(message.body, mySecret),
+                  timestamp: message.timestamp,
+                  outgoing: message.outgoing
+                }
+              }
+            )
+          }
+        )
+        currentChatBotsChats = newChats
+        notifyChatBotsChatsListeners()
+      } catch (err) {
+        logger.info('--------------------------')
+        logger.info('Events -> onChatBotsChats')
+        logger.info(err)
+        logger.info('--------------------------')
+      }
+    }, 400)
+  )
+  chatBotsChatsSubbed = true
+  return deletecb
+}
+
 module.exports = {
   __onUserToIncoming,
   onAvatar,
@@ -634,5 +760,7 @@ module.exports = {
   getAvatar,
   getDisplayName,
   getHandshakeAddress,
-  getChats
+  getChats,
+  getCurrentChatBotsChats,
+  onChatBotsChats
 }
