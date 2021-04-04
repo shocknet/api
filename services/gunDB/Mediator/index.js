@@ -309,6 +309,16 @@ const getUser = () => {
  * @returns {Promise<string>}
  */
 const authenticate = async (alias, pass, __user) => {
+  if (!Common.isPopulatedString(alias)) {
+    throw new TypeError(
+      `Expected alias to be a populated string, instead got: ${alias}`
+    )
+  }
+  if (!Common.isPopulatedString(pass)) {
+    throw new TypeError(
+      `Expected pass to be a populated string, instead got: ${pass}`
+    )
+  }
   const _user = __user || user
   const isFreshGun = _user !== user
   if (isFreshGun) {
