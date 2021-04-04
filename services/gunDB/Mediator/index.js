@@ -390,7 +390,7 @@ const authenticate = async (alias, pass, __user) => {
 
   if (isAuthenticating()) {
     throw new Error(
-      'Cannot authenticate while another authentication attempt is going on'
+      'A Gun pending/failed login attempt was found, restart api, make an api issue issue use its number so we can gather info there.'
     )
   }
 
