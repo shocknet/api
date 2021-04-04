@@ -2,6 +2,7 @@
  * @format
  */
 const Gun = require('gun')
+const Common = require('shock-common')
 // @ts-ignore
 require('gun/nts')
 const logger = require('winston')
@@ -406,7 +407,7 @@ const authenticate = async (alias, pass, __user) => {
 
   if (typeof ack.err === 'string') {
     throw new Error(ack.err)
-  } else if (typeof ack.sea === 'object') {
+  } else if (Common.isObj(ack.sea)) {
     mySec = await mySEA.secret(_user._.sea.epub, _user._.sea)
 
     _currentAlias = alias
