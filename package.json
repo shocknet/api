@@ -36,7 +36,7 @@
     "eccrypto": "^1.1.6",
     "express": "^4.14.1",
     "express-session": "^1.17.1",
-    "google-proto-files": "^1.0.3",
+    "google-proto-files": "^2.4.0",
     "graphviz": "0.0.8",
     "grpc": "1.24.4",
     "gun": "git://github.com/amark/gun#97aa976c97e6219a9f93095d32c220dcd371ca62",
