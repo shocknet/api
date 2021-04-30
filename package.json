@@ -41,7 +41,7 @@
     "grpc": "1.24.4",
     "gun": "git://github.com/amark/gun#97aa976c97e6219a9f93095d32c220dcd371ca62",
     "husky": "^4.2.5",
-    "jsonfile": "^4.0.0",
+    "jsonfile": "^6.1.0",
     "jsonwebtoken": "^8.3.0",
     "localtunnel": "git://github.com/shocknet/localtunnel#40cc2c2a46b05da2217bf2e20da11a5343a5cce7",
     "lodash": "^4.17.21",
