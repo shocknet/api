@@ -23,7 +23,7 @@
     "axios": "^0.21.1",
     "basic-auth": "^2.0.0",
     "big.js": "^5.2.2",
-    "bitcore-lib": "^0.15.0",
+    "bitcore-lib": "^8.25.8",
     "bluebird": "^3.7.2",
     "body-parser": "^1.16.0",
     "colors": "^1.4.0",
