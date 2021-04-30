@@ -45,7 +45,7 @@
     "jsonwebtoken": "^8.3.0",
     "localtunnel": "git://github.com/shocknet/localtunnel#40cc2c2a46b05da2217bf2e20da11a5343a5cce7",
     "lodash": "^4.17.21",
-    "method-override": "^2.3.7",
+    "method-override": "^3.0.0",
     "node-fetch": "^2.6.1",
     "node-persist": "^3.1.0",
     "promise": "^8.1.0",
