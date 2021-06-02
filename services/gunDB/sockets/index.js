@@ -402,7 +402,19 @@ const startSocket = socket => {
     })
 
     socket.on('disconnect', () => {
-      Subscriptions.removeDevice({ deviceId: encryptionId })
+      try {
+        logger.info(
+          `socket disconnect -> `,
+          JSON.stringify(socket?.handshake?.query, null, 4)
+        )
+
+        Subscriptions.removeDevice({ deviceId: encryptionId })
+      } catch (e) {
+        logger.error(
+          `gunDB -> sockets -> startSocket -> socket.on(disconnect) -> `,
+          e
+        )
+      }
     })
   } catch (err) {
     logger.error('GUNRPC: ' + err.message)

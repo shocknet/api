@@ -23,19 +23,27 @@ module.exports = (
   io
 ) => {
   io.on('connect', socket => {
-    const isLNDSocket = !!socket.handshake.auth.IS_LND_SOCKET
-    const isNotificationsSocket = !!socket.handshake.auth
-      .IS_NOTIFICATIONS_SOCKET
+    try {
+      logger.info(
+        'Socket connected, query: ' +
+          JSON.stringify(socket?.handshake?.query, null, 4)
+      )
+      const isLNDSocket = !!socket.handshake.auth.IS_LND_SOCKET
+      const isNotificationsSocket = !!socket.handshake.auth
+        .IS_NOTIFICATIONS_SOCKET
 
-    if (!isLNDSocket) {
-      /** printing out the client who joined */
-      logger.info('New socket client connected (id=' + socket.id + ').')
-    }
+      if (!isLNDSocket) {
+        /** printing out the client who joined */
+        logger.info('New socket client connected (id=' + socket.id + ').')
+      }
 
-    if (isLNDSocket) {
-      const subID = Math.floor(Math.random() * 1000).toString()
-      const isNotifications = isNotificationsSocket ? 'notifications' : ''
-      logger.info('[LND] New LND Socket created:' + isNotifications + subID)
+      if (isLNDSocket) {
+        const subID = Math.floor(Math.random() * 1000).toString()
+        const isNotifications = isNotificationsSocket ? 'notifications' : ''
+        logger.info('[LND] New LND Socket created:' + isNotifications + subID)
+      }
+    } catch (e) {
+      logger.error(`io.on(connect) -> `, e)
     }
   })
 
@@ -105,7 +113,16 @@ module.exports = (
   })
 
   io.of('gun').on('connect', socket => {
-    initGunDBSocket(socket)
+    try {
+      logger.info(
+        'GunSocket connected, query: ' +
+          JSON.stringify(socket?.handshake?.query, null, 4)
+      )
+
+      initGunDBSocket(socket)
+    } catch (e) {
+      logger.error(`io.of(gun).on(connect) -> `, e)
+    }
   })
 
   /**
