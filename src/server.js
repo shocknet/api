@@ -19,6 +19,8 @@ const server = program => {
   const binaryParser = require('socket.io-msgpack-parser')
   const { fork } = require('child_process')
   const EventEmitter = require('events')
+  const FS = require('fs')
+  const Https = require('https')
 
   const ECC = require('../utils/ECC')
   const LightningServices = require('../utils/lightningServices')
@@ -349,20 +351,20 @@ const server = program => {
         res.status(500).send({ status: 500, errorMessage: 'internal error' })
       })
 
-      const CA = LightningServices.servicesConfig.lndCertPath
-      const CA_KEY = CA.replace('cert', 'key')
+      const CA =
+        program.httpsCert || LightningServices.servicesConfig.lndCertPath
+      const CA_KEY = program.httpsCertKey || CA.replace('cert', 'key')
 
       const createServer = () => {
         try {
-          // if (LightningServices.servicesConfig.lndCertPath && program.usetls) {
-          //   const [key, cert] = await Promise.all([
-          //     FS.readFile(CA_KEY),
-          //     FS.readFile(CA)
-          //   ])
-          //   const httpsServer = Https.createServer({ key, cert }, app)
+          if (LightningServices.servicesConfig.lndCertPath && program.useTLS) {
+            const key = FS.readFileSync(CA_KEY, 'utf-8')
+            const cert = FS.readFileSync(CA, 'utf-8')
 
-          //   return httpsServer
-          // }
+            const httpsServer = Https.createServer({ key, cert }, app)
+
+            return httpsServer
+          }
 
           const httpServer = Http.Server(app)
           return httpServer
@@ -377,7 +379,7 @@ const server = program => {
         }
       }
 
-      const serverInstance = await createServer()
+      const serverInstance = createServer()
 
       const io = require('socket.io')(serverInstance, {
         parser: binaryParser,
@@ -411,7 +413,7 @@ const server = program => {
         {
           serverHost,
           serverPort,
-          usetls: program.usetls,
+          useTLS: program.useTLS,
           CA,
           CA_KEY
         }

@@ -18,6 +18,9 @@ program
 	.option("-c, --mainnet", "run server on mainnet mode")
 	.option("-t, --tunnel","create a localtunnel to listen behind a firewall")
 	.option('-r, --lndaddress', 'Lnd address, defaults to 127.0.0.1:9735')
+	.option('-a, --use-TLS', 'use TLS')
+	.option('-i, --https-cert [path]', 'HTTPS certificate path')
+	.option('-y, --https-cert-key [path]', 'HTTPS certificate key path')
 	.parse(process.argv);
 
 // load server
