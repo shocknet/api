@@ -141,7 +141,7 @@ const queryListenerCallback = ({
       })
     }
     const eventName = `query:data`
-    if (publicKeyForDecryption?.length > 15) {
+    if (publicKeyForDecryption) {
       const decData = await deepDecryptIfNeeded(data, publicKeyForDecryption)
       emit(eventName, { subscriptionId, response: { data: decData, key } })
       return

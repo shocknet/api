@@ -5,6 +5,7 @@
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "cSpell.words": [
+    "Epub",
     "ISEA",
     "Reqs"
   ]
