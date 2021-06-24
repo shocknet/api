@@ -56,7 +56,7 @@
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
     "response-time": "^2.3.2",
-    "shelljs": "^0.8.2",
+    "shelljs": "^0.8.4",
     "shock-common": "^37.0.0",
     "socket.io": "4.0.1",
     "socket.io-msgpack-parser": "^3.0.1",
