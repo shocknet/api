@@ -23,7 +23,7 @@
     "assert-never": "^1.2.1",
     "axios": "^0.21.1",
     "basic-auth": "^2.0.0",
-    "big.js": "^5.2.2",
+    "big.js": "^6.1.1",
     "bitcore-lib": "^0.15.0",
     "bluebird": "^3.7.2",
     "body-parser": "^1.16.0",
