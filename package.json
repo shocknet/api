@@ -68,7 +68,7 @@
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.12.1",
     "@types/bluebird": "^3.5.32",
-    "@types/dotenv": "^6.1.1",
+    "@types/dotenv": "^8.2.0",
     "@types/eccrypto": "^1.1.2",
     "@types/express": "^4.17.1",
     "@types/gun": "^0.9.2",
